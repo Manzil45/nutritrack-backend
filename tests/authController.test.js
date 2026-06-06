@@ -1,3 +1,4 @@
+//tests/authController.test.js
 const request = require('supertest');
 const express = require('express');
 const mongoose = require('mongoose');
@@ -196,5 +197,39 @@ describe('Auth Controller Testing', () => {
     }, 15000);
 
   });
+
+  const loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  // Validasi input
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Please add all fields' });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+
+    // ✅ Pisah pengecekan user dan password
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    res.json({
+      _id: user.id,
+      name: user.name,
+      email: user.email,
+      token: generateToken(user._id),
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 });
