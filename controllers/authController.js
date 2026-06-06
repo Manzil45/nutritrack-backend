@@ -56,27 +56,59 @@ const registerUser = async (req, res) => {
 // @desc    Authenticate a user
 // @route   POST /api/auth/login
 // @access  Public
+// const loginUser = async (req, res) => {
+//   const { email, password } = req.body;
+
+//   try {
+//     // Check for user email
+//     const user = await User.findOne({ email });
+
+//     if (user && (await bcrypt.compare(password, user.password))) {
+//       res.json({
+//         _id: user.id,
+//         name: user.name,
+//         email: user.email,
+//         token: generateToken(user._id),
+//       });
+//     } else {
+//       res.status(400).json({ message: 'Invalid credentials' });
+//     }
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Please add all fields' });
+  }
+
   try {
-    // Check for user email
     const user = await User.findOne({ email });
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-      res.json({
-        _id: user.id,
-        name: user.name,
-        email: user.email,
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(400).json({ message: 'Invalid credentials' });
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    res.json({
+      _id: user.id,
+      name: user.name,
+      email: user.email,
+      token: generateToken(user._id),
+    });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // @desc    Get user data
 // @route   GET /api/auth/me
