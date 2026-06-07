@@ -7,7 +7,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  # ======================================
+  # JOB 1: TEST
+  # ======================================
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,8 +32,29 @@ jobs:
       - name: Security Audit
         run: npm audit --audit-level=high
 
-      - name: Run Tests
-        run: npm test
+      - name: Run Tests with Coverage
+        run: npm test -- --coverage
+
+  # ======================================
+  # JOB 2: DEPLOY
+  # ======================================
+  deploy:
+    needs: test # ← deploy hanya jalan kalau test sukses
+    if: success() # ← conditional deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
