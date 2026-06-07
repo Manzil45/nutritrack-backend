@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
+// const { MongoMemoryServer } = require('mongodb-memory-server');
 
 const User = require('../models/User');
 const { protect } = require('../middleware/authMiddleware');
@@ -16,7 +16,7 @@ jest.mock('../models/User');
 // SETUP
 // ======================================
 
-let mongoServer;
+// let mongoServer;
 
 beforeAll(async () => {
   process.env.JWT_SECRET = 'test_jwt_secret';

@@ -61,7 +61,7 @@ const safeParse = (text) => {
   }
 };
 
-const fallbackResponse = (message) => ({
+const fallbackResponse = (_message) => ({
   text: "I couldn’t calculate exact nutrition for that. Please try adding more detail (quantity, ingredients, etc).",
   hasBento: false,
   bentoData: null,
