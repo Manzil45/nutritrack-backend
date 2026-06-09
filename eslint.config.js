@@ -18,15 +18,15 @@ module.exports = [
         console: 'readonly',
       }
     },
-   rules: {
-  'no-unused-vars': ['warn', { 
-    varsIgnorePattern: '^_',
-    argsIgnorePattern: '^_',
-    caughtErrorsIgnorePattern: '^_'
-  }],
-  'no-console': 'off',
-  'eqeqeq': 'error',
-}
+    rules: {
+      'no-unused-vars': ['warn', { 
+        varsIgnorePattern: '^_',
+        argsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_'
+      }],
+      'no-console': 'off',
+      'eqeqeq': 'error',
+    }
   },
   {
     files: ['tests/**/*.js'],
@@ -36,6 +36,7 @@ module.exports = [
         require: 'readonly',
         module: 'readonly',
         process: 'readonly',
+        console: 'readonly',
         describe: 'readonly',
         test: 'readonly',
         expect: 'readonly',
@@ -43,12 +44,16 @@ module.exports = [
         afterAll: 'readonly',
         beforeEach: 'readonly',
         afterEach: 'readonly',
-        jest: 'readonly',      
+        jest: 'readonly',
         it: 'readonly',
       }
     },
     rules: {
-      'no-unused-vars': 'warn',
+      'no-unused-vars': ['warn', {
+        varsIgnorePattern: '^_',
+        argsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_'
+      }],
       'no-console': 'off',
     }
   }

@@ -1,10 +1,10 @@
+
 // tests/profileController.test.js
 const request = require('supertest');
 const express = require('express');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
-const User = require('../models/User');
 const { getProfile, updateProfile } = require('../controllers/profileController');
 const { loginUser, registerUser } = require('../controllers/authController');
 const { protect: authMiddleware } = require('../middleware/authMiddleware');

@@ -4,8 +4,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
-const User = require('../models/User');
-
 // Mock @google/genai so tests don't call the real Gemini API
 jest.mock('@google/genai', () => {
   const mockGenerateContent = jest.fn().mockImplementation(({ contents }) => {
@@ -64,7 +62,6 @@ app.post('/api/chat', authMiddleware, sendMessage);
 
 let mongoServer;
 let token;
-let userId;
 
 beforeAll(async () => {
   process.env.JWT_SECRET = 'test_jwt_secret';
@@ -80,14 +77,13 @@ beforeAll(async () => {
     password: 'password123',
   };
 
-  const registerRes = await request(app).post('/auth/register').send(testUserData);
+  const _registerRes = await request(app).post('/auth/register').send(testUserData);
   const loginRes = await request(app).post('/auth/login').send({
     email: testUserData.email,
     password: testUserData.password,
   });
 
   token = loginRes.body.token;
-  userId = loginRes.body._id;
 }, 30000);
 
 afterAll(async () => {
