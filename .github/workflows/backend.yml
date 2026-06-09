@@ -42,7 +42,25 @@ jobs:
           path: ./coverage
           retention-days: 7
 
-      # ← notif kalau job test gagal
+      - name: Notify Discord on Test Success
+        if: success()
+        run: |
+          curl -X POST ${{ secrets.DISCORD_WEBHOOK }} \
+          -H "Content-Type: application/json" \
+          -d '{
+            "embeds": [{
+              "title": "✅ Test Passed!",
+              "description": "Pipeline **Backend CI/CD** berhasil di tahap testing.",
+              "color": 3066993,
+              "fields": [
+                {"name": "Repository", "value": "${{ github.repository }}"},
+                {"name": "Branch", "value": "${{ github.ref_name }}"},
+                {"name": "Triggered by", "value": "${{ github.actor }}"},
+                {"name": "Logs", "value": "[Klik di sini](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"}
+              ]
+            }]
+          }'
+
       - name: Notify Discord on Test Failure
         if: failure()
         run: |
@@ -90,7 +108,25 @@ jobs:
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BACKEND }}
           package: .
 
-      # ← notif kalau job deploy gagal
+      - name: Notify Discord on Deploy Success
+        if: success()
+        run: |
+          curl -X POST ${{ secrets.DISCORD_WEBHOOK }} \
+          -H "Content-Type: application/json" \
+          -d '{
+            "embeds": [{
+              "title": "🚀 Deploy Berhasil!",
+              "description": "Pipeline **Backend CI/CD** berhasil deploy ke production.",
+              "color": 3066993,
+              "fields": [
+                {"name": "Repository", "value": "${{ github.repository }}"},
+                {"name": "Branch", "value": "${{ github.ref_name }}"},
+                {"name": "Triggered by", "value": "${{ github.actor }}"},
+                {"name": "Logs", "value": "[Klik di sini](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"}
+              ]
+            }]
+          }'
+
       - name: Notify Discord on Deploy Failure
         if: failure()
         run: |
