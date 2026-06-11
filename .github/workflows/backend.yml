@@ -77,13 +77,14 @@ jobs:
 
     environment:
       name: staging
-      url: https://nutritrack-backend-staging-d6gmdncmagdhh5e2.indonesiacentral-01.azurewebsites.net
+      url: https://nutritrack-backend-staging-container.azurewebsites.net
 
     steps:
+      # FIX 1: app-name diubah ke nama yang benar sesuai Azure Portal
       - name: Deploy to Azure Web App (Staging)
         uses: azure/webapps-deploy@v3
         with:
-          app-name: nutritrack-backend-staging
+          app-name: nutritrack-backend-staging-container
           publish-profile: ${{ secrets.AZURE_WEBAPP_STAGING_PUBLISH_PROFILE }}
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
@@ -103,10 +104,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # FIX 2: URL health check disesuaikan dengan app name yang benar
       - name: Wait for Staging to be Ready
         run: |
           for i in {1..30}; do
-            if curl -f https://nutritrack-backend-staging-d6gmdncmagdhh5e2.indonesiacentral-01.azurewebsites.net/api/health; then
+            if curl -f https://nutritrack-backend-staging-container.azurewebsites.net/api/health; then
               echo "Staging is ready"
               exit 0
             fi
@@ -123,7 +125,7 @@ jobs:
             --reporters cli,json \
             --reporter-json-export=smoke-test-results.json
         env:
-          STAGING_API_URL: https://nutritrack-backend-staging-d6gmdncmagdhh5e2.indonesiacentral-01.azurewebsites.net
+          STAGING_API_URL: https://nutritrack-backend-staging-container.azurewebsites.net
 
       - name: Upload Smoke Test Results
         if: always()
@@ -132,9 +134,10 @@ jobs:
           name: smoke-test-results
           path: smoke-test-results.json
 
+      # FIX 3: URL Gemini check disesuaikan
       - name: Check Gemini AI Integration
         run: |
-          curl -X POST https://nutritrack-backend-staging-d6gmdncmagdhh5e2.indonesiacentral-01.azurewebsites.net/api/nutrition/analyze \
+          curl -X POST https://nutritrack-backend-staging-container.azurewebsites.net/api/nutrition/analyze \
             -H "Authorization: Bearer ${{ secrets.STAGING_TEST_TOKEN }}" \
             -H "Content-Type: application/json" \
             -d '{
@@ -142,13 +145,14 @@ jobs:
               "servingSize": "1 medium apple + 2 tbsp PB"
             }' | jq .
 
+      # FIX 4: URL performance check disesuaikan
       - name: Performance Check
         run: |
           echo "Checking API response times..."
           for endpoint in "/api/health" "/api/users/profile" "/api/meals"; do
             time_taken=$(curl -o /dev/null -s -w '%{time_total}' \
               -H "Authorization: Bearer ${{ secrets.STAGING_TEST_TOKEN }}" \
-              https://nutritrack-backend-staging-d6gmdncmagdhh5e2.indonesiacentral-01.azurewebsites.net$endpoint)
+              https://nutritrack-backend-staging-container.azurewebsites.net$endpoint)
             echo "Endpoint $endpoint took ${time_taken}s"
             if (( $(echo "$time_taken > 3.0" | bc -l) )); then
               echo "⚠️ Warning: Slow response time detected"
@@ -168,7 +172,7 @@ jobs:
         run: |
           echo "✅ Staging deployment successful"
           echo "📋 Awaiting manual approval to proceed to production"
-          echo "🔗 Review staging: https://nutritrack-backend-staging-d6gmdncmagdhh5e2.indonesiacentral-01.azurewebsites.net"
+          echo "🔗 Review staging: https://nutritrack-backend-staging-container.azurewebsites.net"
 
   # ==================== DEPLOY TO PRODUCTION ====================
   deploy-production:
