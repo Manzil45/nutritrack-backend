@@ -17,8 +17,6 @@ env:
 
 jobs:
   # ==================== CI: TEST & BUILD ====================
-  # Jalan di GitHub Actions runner (simulasi local)
-  # Tugas: lint, test, build docker image, push ke registry
   ci:
     name: Continuous Integration
     runs-on: ubuntu-latest
@@ -36,15 +34,14 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      # ✅ PERBAIKAN 1: Lint sekarang WAJIB, pipeline stop kalau gagal
       - name: Lint Code
-        run: npm run lint --if-present || echo "No lint script found"
+        run: npm run lint
 
-      # ---- UNIT TEST ----
+      # ✅ PERBAIKAN 2: Hapus continue-on-error, test sekarang WAJIB lulus
       - name: Run Unit Tests
         run: npm test -- --coverage --passWithNoTests
-        continue-on-error: true
 
-      # ---- ARTIFACT 1: Coverage Report (hasil unit test) ----
       - name: Upload Coverage Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -81,8 +78,6 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
   # ==================== STAGING ====================
-  # Deploy ke Azure staging (DB sample, untuk review client/atasan/dosen)
-  # DB: MONGO_URI staging = database baru khusus staging, bukan production
   deploy-staging:
     name: Deploy to Staging
     needs: ci
@@ -108,7 +103,6 @@ jobs:
           DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
 
   # ==================== SMOKE TEST STAGING ====================
-  # Verifikasi staging berjalan normal sebelum lanjut ke production
   smoke-tests-staging:
     name: Smoke Tests on Staging
     needs: deploy-staging
@@ -130,7 +124,6 @@ jobs:
           done
           exit 1
 
-      # ---- SMOKE TEST (tidak block pipeline) ----
       - name: Run Smoke Tests
         continue-on-error: true
         run: |
@@ -142,7 +135,6 @@ jobs:
         env:
           STAGING_API_URL: https://nutritrack-backend-staging-container-dhbhgca0hvatgabz.indonesiacentral-01.azurewebsites.net
 
-      # ---- ARTIFACT 2: Smoke Test Results ----
       - name: Upload Smoke Test Results
         if: always()
         uses: actions/upload-artifact@v4
@@ -150,7 +142,6 @@ jobs:
           name: smoke-test-results
           path: smoke-test-results.json
 
-      # ---- CEK GEMINI AI (tidak block pipeline) ----
       - name: Check Gemini AI Integration
         continue-on-error: true
         run: |
@@ -162,7 +153,6 @@ jobs:
               "servingSize": "1 medium apple + 2 tbsp PB"
             }' | jq . || true
 
-      # ---- PERFORMANCE CHECK (tidak block pipeline) ----
       - name: Performance Check
         continue-on-error: true
         run: |
@@ -178,8 +168,6 @@ jobs:
           done
 
   # ==================== APPROVAL GATE ====================
-  # Manual review staging sebelum deploy ke production
-  # Tim/dosen bisa cek staging dulu di URL staging
   approval-gate:
     name: Approval Gate
     needs: smoke-tests-staging
@@ -195,8 +183,6 @@ jobs:
           echo "🔗 Review staging: https://nutritrack-backend-staging-container-dhbhgca0hvatgabz.indonesiacentral-01.azurewebsites.net"
 
   # ==================== CD: DEPLOY PRODUCTION ====================
-  # Hanya jalan setelah manual approval
-  # DB: MONGO_URI production = database real/production
   deploy-production:
     name: Deploy to Production
     needs: approval-gate
@@ -209,6 +195,7 @@ jobs:
 
     steps:
       - name: Deploy to Azure Web App (Production)
+        id: deploy
         uses: azure/webapps-deploy@v3
         with:
           app-name: nutritrack-backend-bisa
@@ -216,6 +203,7 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
 
       - name: Health Check Production
+        id: health-check
         run: |
           sleep 30
           for i in {1..10}; do
@@ -227,7 +215,36 @@ jobs:
           done
           exit 1
 
+      # ✅ PERBAIKAN 3: Rollback otomatis kalau health check gagal
+      - name: Rollback on Health Check Failure
+        if: failure() && steps.health-check.outcome == 'failure'
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: nutritrack-backend-bisa
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BACKEND }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Notify Rollback
+        if: failure() && steps.health-check.outcome == 'failure'
+        run: |
+          curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
+          -H "Content-Type: application/json" \
+          -d '{
+            "embeds": [{
+              "title": "⚠️ Production Health Check Failed — Rolled Back!",
+              "description": "Health check gagal, NutriTrack Backend di-rollback ke versi sebelumnya.",
+              "color": 16776960,
+              "fields": [
+                {"name": "App", "value": "nutritrack-backend-bisa"},
+                {"name": "Commit Gagal", "value": "${{ github.sha }}"},
+                {"name": "Branch", "value": "${{ github.ref_name }}"},
+                {"name": "Logs", "value": "[Klik di sini](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"}
+              ]
+            }]
+          }'
+
       - name: Notify Deployment Success
+        if: success()
         run: |
           curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
           -H "Content-Type: application/json" \
@@ -247,11 +264,12 @@ jobs:
           }'
 
   # ==================== ERROR NOTIFICATION ====================
+  # ✅ PERBAIKAN 4: Tambah deploy-production ke needs supaya notif kalau production gagal
   notify-failure:
     name: Notify on Failure
     runs-on: ubuntu-latest
     if: failure()
-    needs: [ci, deploy-staging, smoke-tests-staging]
+    needs: [ci, deploy-staging, smoke-tests-staging, deploy-production]
 
     steps:
       - name: Notify Discord on Failure
