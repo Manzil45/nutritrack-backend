@@ -205,7 +205,7 @@ jobs:
 
     environment:
       name: production
-      url: https://nutritrack-backend-bisa.azurewebsites.net
+      url: https://nutritrack-backend-bisa-cth6c8dte7cfcmbc.indonesiacentral-01.azurewebsites.net
 
     steps:
       - name: Deploy to Azure Web App (Production)
@@ -219,7 +219,7 @@ jobs:
         run: |
           sleep 30
           for i in {1..10}; do
-            if curl -f https://nutritrack-backend-bisa.azurewebsites.net/api/health; then
+            if curl -f https://nutritrack-backend-bisa-cth6c8dte7cfcmbc.indonesiacentral-01.azurewebsites.net/api/health; then
               echo "✅ Production deployment healthy"
               exit 0
             fi
