@@ -1,7 +1,7 @@
 {
   "name": "NutriTrack Staging",
   "values": [
-    {"key": "base_url", "value": "nutritrack-backend-staging-container-dhbhgca0hvatgabz.indonesiacentral-01.azurewebsites.net", "enabled": true},
+    {"key": "base_url", "value": "https://nutritrack-backend-staging-container-dhbhgca0hvatgabz.indonesiacentral-01.azurewebsites.net", "enabled": true},
     {"key": "test_email", "value": "test@nutritrack.com", "enabled": true},
     {"key": "test_password", "value": "testpassword123", "enabled": true},
     {"key": "staging_token", "value": "{{STAGING_TEST_TOKEN}}", "enabled": true}
