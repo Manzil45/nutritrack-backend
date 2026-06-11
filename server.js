@@ -38,8 +38,17 @@ app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/chat', require('./routes/chat'));
 
 // Global Error Handler must be after all routes
-app.use(errorHandler);
+// ← TAMBAH INI
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'ok', 
+    service: 'nutritrack-backend',
+    timestamp: new Date().toISOString()
+  });
+});
 
+// Global Error Handler must be after all routes
+app.use(errorHandler);
 app.get('/', (req, res) => {
   res.send('NutriTrack API is running');
 });

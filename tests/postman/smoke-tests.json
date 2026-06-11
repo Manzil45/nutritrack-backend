@@ -1,0 +1,61 @@
+{
+  "info": {
+    "name": "NutriTrack Smoke Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/health"
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+            "pm.test('Status is ok', () => pm.expect(pm.response.json().status).to.equal('ok'));"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/api/auth/login",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"{{test_email}}\", \"password\": \"{{test_password}}\"}"
+        }
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+            "pm.test('Has token', () => pm.expect(pm.response.json()).to.have.property('token'));"
+          ]
+        }
+      }]
+    },
+    {
+      "name": "Get Meals",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/meals",
+        "header": [{"key": "Authorization", "value": "Bearer {{staging_token}}"}]
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Status is 200', () => pm.response.to.have.status(200));"
+          ]
+        }
+      }]
+    }
+  ]
+}
