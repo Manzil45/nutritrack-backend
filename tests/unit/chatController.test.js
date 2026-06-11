@@ -1,4 +1,4 @@
-const chatController = require('../controllers/chatController'); // Pastikan path ini mengarah ke chatController.js kamu
+const chatController = require('../../controllers/chatController'); // Pastikan path ini mengarah ke chatController.js kamu
 const { GoogleGenAI } = require('@google/genai');
 
 // ======================================

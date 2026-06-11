@@ -1,11 +1,8 @@
 const mongoose = require('mongoose');
-const foodController = require('../controllers/foodController'); // Sesuaikan path-nya
-const FoodItem = require('../models/FoodItem');
+const foodController = require('../../controllers/foodController');
+const FoodItem = require('../../models/FoodItem');
 
-// ======================================
-// MOCKING DATABASE
-// ======================================
-jest.mock('../models/FoodItem');
+jest.mock('../../models/FoodItem');
 
 // ======================================
 // HELPER REQ & RES PALSU

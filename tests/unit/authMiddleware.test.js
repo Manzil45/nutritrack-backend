@@ -2,15 +2,15 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 // const { MongoMemoryServer } = require('mongodb-memory-server');
 
-const User = require('../models/User');
-const { protect } = require('../middleware/authMiddleware');
+const User = require('../../models/User');
+const { protect } = require('../../middleware/authMiddleware');
 
 // ======================================
 // MOCK
 // ======================================
 
 jest.mock('jsonwebtoken');
-jest.mock('../models/User');
+jest.mock('../../models/User');
 
 // ======================================
 // SETUP

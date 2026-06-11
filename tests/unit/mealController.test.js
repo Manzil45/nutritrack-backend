@@ -1,12 +1,8 @@
 const mongoose = require('mongoose');
-const mealController = require('../controllers/mealController');
-const MealLog = require('../models/MealLog');
+const mealController = require('../../controllers/mealController');
+const MealLog = require('../../models/MealLog');
 
-// ======================================
-// MOCK
-// ======================================
-// Melakukan mock penuh pada model MealLog agar tidak menembak DB asli
-jest.mock('../models/MealLog');
+jest.mock('../../models/MealLog');
 
 // ======================================
 // HELPER
