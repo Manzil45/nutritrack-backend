@@ -40,7 +40,10 @@ jobs:
 
       # ✅ PERBAIKAN 2: Hapus continue-on-error, test sekarang WAJIB lulus
       - name: Run Unit Tests
-        run: npm test -- --coverage --passWithNoTests
+        run: npm test
+
+      - name: Run Integration Tests
+        run: npm run test:integration
 
       - name: Upload Coverage Report
         if: always()
@@ -57,8 +60,7 @@ jobs:
           fail_ci_if_error: false
 
       - name: Security Audit
-        run: npm audit --audit-level=moderate
-        continue-on-error: true
+        run: npm audit --audit-level=high
 
       # ---- BUILD & PUSH DOCKER IMAGE ----
       - name: Login to Azure Container Registry
@@ -76,6 +78,33 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+  notify-ci-success:
+    name: Notify CI Success
+    needs: ci
+    if: success()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Notify Discord
+        run: |
+          curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
+          -H "Content-Type: application/json" \
+          -d '{
+            "embeds": [{
+              "title": "✅ CI SUCCESS",
+              "description": "Continuous Integration berhasil.",
+              "color": 3066993,
+              "fields": [
+                {"name": "Branch", "value": "${{ github.ref_name }}"},
+                {"name": "Commit", "value": "${{ github.sha }}"},
+                {"name": "Triggered By", "value": "${{ github.actor }}"},
+                {"name": "Workflow", "value": "${{ github.workflow }}"},
+                {"name": "Checks Passed", "value": "Lint, Tests, Security Audit, Docker Build"},
+                {"name": "Logs", "value": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+              ]
+            }]
+          }'
 
   # ==================== STAGING ====================
   deploy-staging:
@@ -125,7 +154,6 @@ jobs:
           exit 1
 
       - name: Run Smoke Tests
-        continue-on-error: true
         run: |
           npm install -g newman
           newman run ./tests/postman/smoke-tests.json \
@@ -167,6 +195,32 @@ jobs:
             fi
           done
 
+  notify-staging-success:
+    name: Notify Staging Success
+    needs: smoke-tests-staging
+    if: success()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Notify Discord
+        run: |
+          curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
+          -H "Content-Type: application/json" \
+          -d '{
+            "embeds": [{
+              "title": "🟦 STAGING DEPLOYED",
+              "description": "Deployment ke staging berhasil.",
+              "color": 3447003,
+              "fields": [
+                {"name": "Environment", "value": "Staging"},
+                {"name": "Branch", "value": "${{ github.ref_name }}"},
+                {"name": "Commit", "value": "${{ github.sha }}"},
+                {"name": "Smoke Test", "value": "PASSED"},
+                {"name": "URL", "value": "https://nutritrack-backend-staging-container-dhbhgca0hvatgabz.indonesiacentral-01.azurewebsites.net"}
+              ]
+            }]
+          }'
+
   # ==================== APPROVAL GATE ====================
   approval-gate:
     name: Approval Gate
@@ -178,9 +232,21 @@ jobs:
     steps:
       - name: Notify Approval Required
         run: |
-          echo "✅ Staging deployment successful"
-          echo "📋 Awaiting manual approval to proceed to production"
-          echo "🔗 Review staging: https://nutritrack-backend-staging-container-dhbhgca0hvatgabz.indonesiacentral-01.azurewebsites.net"
+          curl -X POST ${{ secrets.DISCORD_WEBHOOK_URL }} \
+          -H "Content-Type: application/json" \
+          -d '{
+            "embeds": [{
+              "title": "📝 APPROVAL REQUIRED",
+              "description": "Staging berhasil dan menunggu approval sebelum production.",
+              "color": 16776960,
+              "fields": [
+                {"name": "Environment", "value": "Staging"},
+                {"name": "Branch", "value": "${{ github.ref_name }}"},
+                {"name": "Commit", "value": "${{ github.sha }}"},
+                {"name": "Reviewer Action", "value": "Approve deployment to Production"}
+              ]
+            }]
+          }'
 
   # ==================== CD: DEPLOY PRODUCTION ====================
   deploy-production:
@@ -254,12 +320,15 @@ jobs:
               "description": "NutriTrack Backend berhasil deploy ke production.",
               "color": 2664261,
               "fields": [
-                {"name": "App", "value": "nutritrack-backend-bisa"},
-                {"name": "Commit", "value": "${{ github.sha }}"},
-                {"name": "Branch", "value": "${{ github.ref_name }}"},
-                {"name": "Triggered by", "value": "${{ github.actor }}"},
-                {"name": "Logs", "value": "[Klik di sini](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"}
-              ]
+              {"name": "App", "value": "nutritrack-backend-bisa"},
+              {"name": "Environment", "value": "Production"},
+              {"name": "Commit", "value": "${{ github.sha }}"},
+              {"name": "Branch", "value": "${{ github.ref_name }}"},
+              {"name": "Triggered By", "value": "${{ github.actor }}"},
+              {"name": "Workflow", "value": "${{ github.workflow }}"},
+              {"name": "Health Check", "value": "PASSED"},
+              {"name": "Logs", "value": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+            ]
             }]
           }'
 
@@ -282,9 +351,13 @@ jobs:
               "description": "Pipeline **Backend CI/CD with Staging** gagal.",
               "color": 15158332,
               "fields": [
-                {"name": "Branch", "value": "${{ github.ref_name }}"},
-                {"name": "Triggered by", "value": "${{ github.actor }}"},
-                {"name": "Logs", "value": "[Klik di sini](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"}
-              ]
+              {"name": "App", "value": "nutritrack-backend-bisa"},
+              {"name": "Branch", "value": "${{ github.ref_name }}"},
+              {"name": "Commit", "value": "${{ github.sha }}"},
+              {"name": "Triggered By", "value": "${{ github.actor }}"},
+              {"name": "Workflow", "value": "${{ github.workflow }}"},
+              {"name": "Run Number", "value": "${{ github.run_number }}"},
+              {"name": "Logs", "value": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}
+            ]
             }]
           }'
