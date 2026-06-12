@@ -4,8 +4,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
-const User = require('../models/User');
-const { registerUser, loginUser } = require('../controllers/authController');
+const User = require('../../models/User');
+const { registerUser, loginUser } = require('../../controllers/authController');
 
 const app = express();
 app.use(express.json());

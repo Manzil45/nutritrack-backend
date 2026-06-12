@@ -44,9 +44,9 @@ jest.mock('@google/genai', () => {
   };
 });
 
-const { chatWithGemini: sendMessage } = require('../controllers/chatController');
-const { loginUser, registerUser } = require('../controllers/authController');
-const { protect: authMiddleware } = require('../middleware/authMiddleware');
+const { chatWithGemini: sendMessage } = require('../../controllers/chatController');
+const { loginUser, registerUser } = require('../../controllers/authController');
+const { protect: authMiddleware } = require('../../middleware/authMiddleware');
 
 const app = express();
 app.use(express.json());
