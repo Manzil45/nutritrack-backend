@@ -5,9 +5,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
-const { getProfile, updateProfile } = require('../controllers/profileController');
-const { loginUser, registerUser } = require('../controllers/authController');
-const { protect: authMiddleware } = require('../middleware/authMiddleware');
+const { getProfile, updateProfile } = require('../../controllers/profileController');
+const { loginUser, registerUser } = require('../../controllers/authController');
+const { protect: authMiddleware } = require('../../middleware/authMiddleware');
 
 const app = express();
 app.use(express.json());
