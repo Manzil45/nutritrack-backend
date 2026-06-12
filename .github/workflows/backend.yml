@@ -281,6 +281,20 @@ jobs:
           done
           exit 1
 
+      - name: Mark Deployment as Stable
+        if: success()
+        run: |
+          echo "Deployment succesful, marked as stable"
+
+      # step ci untuk push tag stable setelah deploy production sukses
+      - name: Tag as Stable
+        if: success()
+        run: |
+          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+                        ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:stable
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:stable
+
       # ✅ PERBAIKAN 3: Rollback otomatis kalau health check gagal
       - name: Rollback on Health Check Failure
         if: failure() && steps.health-check.outcome == 'failure'
@@ -288,7 +302,7 @@ jobs:
         with:
           app-name: nutritrack-backend-bisa
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BACKEND }}
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:stable
 
       - name: Notify Rollback
         if: failure() && steps.health-check.outcome == 'failure'
