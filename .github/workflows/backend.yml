@@ -62,14 +62,6 @@ jobs:
       - name: Security Audit
         run: npm audit --audit-level=high
 
-      # ---- BUILD & PUSH DOCKER IMAGE ----
-      - name: Login to Azure Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
-          password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
-
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
@@ -285,6 +277,14 @@ jobs:
         if: success()
         run: |
           echo "Deployment succesful, marked as stable"
+
+      # ---- BUILD & PUSH DOCKER IMAGE ----
+      - name: Login to Azure Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+          password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
       # step ci untuk push tag stable setelah deploy production sukses
       - name: Tag as Stable
