@@ -1,0 +1,7 @@
+{
+  "name": "NutriTrack Production",
+  "values": [
+    { "key": "BASE_URL", "value": "https://nutritrack-backend-bisa-cth6c8dte7cfcmbc.indonesiacentral-01.azurewebsites.net", "enabled": true },
+    { "key": "FE_URL", "value": "https://nutritrack-frontend-bisa-apadahfrbpcxe2c8.indonesiacentral-01.azurewebsites.net", "enabled": true }
+  ]
+}
