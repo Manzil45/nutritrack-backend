@@ -200,6 +200,7 @@ jobs:
           npm install -g newman
           newman run ./tests/postman/smoke-tests.json \
             -e ./tests/postman/staging-env.json \
+            --env-var base_url=${{ env.STAGING_URL }} \
             --reporters cli,json \
             --reporter-json-export=smoke-test-results.json
         env:
@@ -448,12 +449,13 @@ jobs:
       - name: Run Smoke Tests on Production
         run: |
           npm install -g newman
-          newman run ./tests/postman/smoke-tests.json \
-            -e ./tests/postman/production-env.json \
-            --reporters cli,json \
-            --reporter-json-export=smoke-test-production-results.json
-        env:
-          PRODUCTION_API_URL: ${{ env.PRODUCTION_URL }}
+           newman run ./tests/postman/smoke-tests.json \
+             -e ./tests/postman/production-env.json \
+             --env-var base_url=${{ env.PRODUCTION_URL }} \
+             --reporters cli,json \
+             --reporter-json-export=smoke-test-production-results.json
+                     env:
+           PRODUCTION_API_URL: ${{ env.PRODUCTION_URL }}
 
       - name: Upload Production Smoke Test Results
         if: always()
