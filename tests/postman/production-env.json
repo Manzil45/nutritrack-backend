@@ -1,10 +1,25 @@
 {
   "name": "NutriTrack Production",
   "values": [
-    { "key": "base_url", "value": "https://nutritrack-backend-bisa-cth6c8dte7cfcmbc.indonesiacentral-01.azurewebsites.net", "enabled": true },
-    { "key": "test_email", "value": "test@nutritrack.com", "enabled": true },
-    { "key": "test_password", "value": "testpassword123", "enabled": true },
-    { "key": "staging_token", "value": "", "enabled": true },
-    { "key": "FE_URL", "value": "https://nutritrack-frontend-bisa-apadahfrbpcxe2c8.indonesiacentral-01.azurewebsites.net", "enabled": true }
+    {
+      "key": "base_url",
+      "value": "https://nutritrack-backend-bisa-cth6c8dte7cfcmbc.indonesiacentral-01.azurewebsites.net",
+      "enabled": true
+    },
+    {
+      "key": "test_email",
+      "value": "{{PRODUCTION_TEST_EMAIL}}",
+      "enabled": true
+    },
+    {
+      "key": "test_password",
+      "value": "{{PRODUCTION_TEST_PASSWORD}}",
+      "enabled": true
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "enabled": true
+    }
   ]
 }

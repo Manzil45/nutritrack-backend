@@ -37,7 +37,9 @@
           "exec": [
             "pm.test('Status is 200', () => pm.response.to.have.status(200));",
             "pm.test('Has token', () => pm.expect(pm.response.json()).to.have.property('token'));",
-            "pm.environment.set('staging_token', pm.response.json().token);"
+            "if (pm.response.json().token) {",
+            "  pm.environment.set('auth_token', pm.response.json().token);",
+            "}"
           ]
         }
       }]
@@ -47,7 +49,7 @@
       "request": {
         "method": "GET",
         "url": "{{base_url}}/api/meals",
-        "header": [{"key": "Authorization", "value": "Bearer {{staging_token}}"}]
+        "header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}]
       },
       "event": [{
         "listen": "test",
