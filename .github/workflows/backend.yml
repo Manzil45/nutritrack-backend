@@ -252,6 +252,7 @@ jobs:
           npm install -g newman
           newman run ./tests/postman/e2e-tests.json \
             -e ./tests/postman/staging-env.json \
+            --env-var BASE_URL=${{ env.STAGING_URL }} \
             --reporters cli,json \
             --reporter-json-export=e2e-test-results.json
 
