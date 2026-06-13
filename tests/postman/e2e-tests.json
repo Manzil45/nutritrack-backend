@@ -25,7 +25,7 @@
       ],
       "request": {
         "method": "GET",
-        "url": "{{BASE_URL}}/api/health"
+        "url": "{{base_url}}/api/health"
       }
     },
     {
@@ -55,7 +55,7 @@
           "mode": "raw",
           "raw": "{\"name\": \"E2E Test User\", \"email\": \"e2etest_{{$timestamp}}@nutritrack.com\", \"password\": \"Test123456\"}"
         },
-        "url": "{{BASE_URL}}/api/auth/register"
+        "url": "{{base_url}}/api/auth/register"
       }
     },
     {
@@ -98,7 +98,7 @@
           "mode": "raw",
           "raw": "{\"email\": \"{{LOGIN_EMAIL}}\", \"password\": \"Test123456\"}"
         },
-        "url": "{{BASE_URL}}/api/auth/login"
+        "url": "{{base_url}}/api/auth/login"
       }
     },
     {
@@ -128,7 +128,7 @@
       "request": {
         "method": "GET",
         "header": [{ "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" }],
-        "url": "{{BASE_URL}}/api/users/profile"
+        "url": "{{base_url}}/api/users/profile"
       }
     },
     {
@@ -159,7 +159,7 @@
           "mode": "raw",
           "raw": "{\"goals\": {\"calories\": 2500, \"protein\": 180, \"carbs\": 300, \"fat\": 70}}"
         },
-        "url": "{{BASE_URL}}/api/users/profile"
+        "url": "{{base_url}}/api/users/profile"
       }
     },
     {
@@ -192,7 +192,7 @@
           "mode": "raw",
           "raw": "{\"name\": \"Nasi Goreng\", \"calories\": 450, \"protein\": 12, \"carbs\": 65, \"fat\": 15, \"mealType\": \"lunch\"}"
         },
-        "url": "{{BASE_URL}}/api/meals"
+        "url": "{{base_url}}/api/meals"
       }
     },
     {
@@ -217,7 +217,7 @@
       "request": {
         "method": "GET",
         "header": [{ "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" }],
-        "url": "{{BASE_URL}}/api/meals"
+        "url": "{{base_url}}/api/meals"
       }
     },
     {
@@ -253,7 +253,7 @@
           "mode": "raw",
           "raw": "{\"message\": \"Berapa kalori nasi goreng 1 porsi?\"}"
         },
-        "url": "{{BASE_URL}}/api/chat"
+        "url": "{{base_url}}/api/chat"
       }
     },
     {
@@ -273,7 +273,7 @@
       "request": {
         "method": "DELETE",
         "header": [{ "key": "Authorization", "value": "Bearer {{AUTH_TOKEN}}" }],
-        "url": "{{BASE_URL}}/api/meals/{{MEAL_ID}}"
+        "url": "{{base_url}}/api/meals/{{MEAL_ID}}"
       }
     },
     {
@@ -292,7 +292,7 @@
       ],
       "request": {
         "method": "GET",
-        "url": "{{BASE_URL}}/api/meals"
+        "url": "{{base_url}}/api/meals"
       }
     }
   ],

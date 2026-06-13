@@ -2,7 +2,7 @@
   "name": "NutriTrack Staging",
   "values": [
     {
-      "key": "base_url",
+      "key": "BASE_URL",
       "value": "https://nutritrack-backend-staging-container-dhbhgca0hvatgabz.indonesiacentral-01.azurewebsites.net",
       "enabled": true
     },
