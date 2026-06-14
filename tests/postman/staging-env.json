@@ -7,7 +7,17 @@
       "enabled": true
     },
     {
-      "key": "staging_token",
+      "key": "test_email",
+      "value": "stagging@gmail.com",
+      "enabled": true
+    },
+    {
+      "key": "test_password",
+      "value": "stagginG456",
+      "enabled": true
+    },
+    {
+      "key": "auth_token",
       "value": "",
       "enabled": true
     },
