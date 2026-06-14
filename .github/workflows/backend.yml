@@ -16,6 +16,7 @@ env:
   IMAGE_NAME: nutritrack-backend
   STAGING_URL: https://nutritrack-backend-staging-container-dhbhgca0hvatgabz.indonesiacentral-01.azurewebsites.net
   PRODUCTION_URL: https://nutritrack-backend-bisa-cth6c8dte7cfcmbc.indonesiacentral-01.azurewebsites.net
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   # ==================== CI: TEST & BUILD ====================
