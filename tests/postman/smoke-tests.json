@@ -21,6 +21,28 @@
       }]
     },
     {
+      "name": "Register",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/api/auth/register",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"name\": \"Smoke Test User\", \"email\": \"smoketest_{{$timestamp}}@nutritrack.com\", \"password\": \"Test123456\"}"
+        }
+      },
+      "event": [{
+        "listen": "test",
+        "script": {
+          "exec": [
+            "pm.test('Register berhasil → 201', () => pm.response.to.have.status(201));",
+            "const email = JSON.parse(pm.request.body.raw).email;",
+            "pm.environment.set('smoke_email', email);"
+          ]
+        }
+      }]
+    },
+    {
       "name": "Login",
       "request": {
         "method": "POST",
@@ -28,7 +50,7 @@
         "header": [{"key": "Content-Type", "value": "application/json"}],
         "body": {
           "mode": "raw",
-          "raw": "{\"email\": \"{{test_email}}\", \"password\": \"{{test_password}}\"}"
+          "raw": "{\"email\": \"{{smoke_email}}\", \"password\": \"Test123456\"}"
         }
       },
       "event": [{
@@ -37,9 +59,7 @@
           "exec": [
             "pm.test('Status is 200', () => pm.response.to.have.status(200));",
             "pm.test('Has token', () => pm.expect(pm.response.json()).to.have.property('token'));",
-            "if (pm.response.json().token) {",
-            "  pm.environment.set('auth_token', pm.response.json().token);",
-            "}"
+            "pm.environment.set('staging_token', pm.response.json().token);"
           ]
         }
       }]
@@ -49,7 +69,7 @@
       "request": {
         "method": "GET",
         "url": "{{base_url}}/api/meals",
-        "header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}]
+        "header": [{"key": "Authorization", "value": "Bearer {{staging_token}}"}]
       },
       "event": [{
         "listen": "test",
