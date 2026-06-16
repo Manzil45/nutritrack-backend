@@ -112,8 +112,7 @@ jobs:
     name: Deploy to Staging
     needs: ci
     runs-on: ubuntu-latest
-    if: false
-    #github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     environment:
       name: staging
