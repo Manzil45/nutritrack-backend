@@ -424,7 +424,6 @@ jobs:
 
   # ==================== SMOKE TEST PRODUCTION ====================
   smoke-tests-production:
-    if: false
     name: Smoke Tests on Production
     needs: deploy-production
     runs-on: ubuntu-latest
@@ -521,7 +520,7 @@ jobs:
     name: Notify on Failure
     runs-on: ubuntu-latest
     if: failure()
-    needs: [ci, deploy-staging, e2e-testing, deploy-production]
+    needs: [ci, deploy-staging, e2e-testing, deploy-production, smoke-tests-production]
 
     steps:
       - name: Notify Discord on Failure
