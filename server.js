@@ -34,14 +34,19 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/profile', require('./routes/profile'));
 app.use('/api/foods', require('./routes/foods'));
 app.use('/api/meals', require('./routes/meals'));
+// === FITUR MEAL REMINDER - START ===
+// Menambahkan endpoint backend untuk fitur alarm makan.
+// Endpoint final: /api/meal-reminders
+app.use('/api/meal-reminders', require('./routes/scheduledMealReminderRoutes'));
+// === FITUR MEAL REMINDER - END ===
 app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/chat', require('./routes/chat'));
 
 // Global Error Handler must be after all routes
 // ← TAMBAH INI
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'ok', 
+  res.status(200).json({
+    status: 'ok',
     service: 'nutritrack-backend',
     timestamp: new Date().toISOString()
   });
